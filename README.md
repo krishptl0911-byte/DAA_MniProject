@@ -1,47 +1,72 @@
-# Emergency Vehicle Route Planner
+# 🚨 911 Emergency Vehicle Route Planner & DAA Algorithm Visualizer
 
-A Java mini project that uses the **Floyd–Warshall algorithm** to find the shortest route between all pairs of city locations. It is designed as an emergency-response example: an ambulance, fire engine, or police vehicle can immediately obtain the best route to a destination.
+A comprehensive **Design and Analysis of Algorithms (DAA)** mini project that simulates real-time emergency vehicle dispatching (Ambulances, Fire Engines, Police Cruisers) across an urban city network using the **Floyd–Warshall Algorithm** ($O(V^3)$ Dynamic Programming) alongside **Dijkstra's Algorithm** for comparative benchmarking.
 
-## Why Floyd–Warshall?
+---
 
-An emergency can happen at any city location. Floyd–Warshall calculates shortest paths for **every source-destination pair** in one run. Once the calculation is complete, the system can respond instantly to a route request.
+## 🌟 Key Features
 
-* **Input:** A weighted city road network.
-* **Output:** The shortest route and total distance between selected locations.
-* **Time complexity:** `O(V³)`
-* **Space complexity:** `O(V²)`
+### 1. 🗺️ Live 2D Interactive City Graph & Dispatch Simulation
+* **Interactive Java2D Canvas:** Anti-aliased graphical city map featuring custom visual badges and glowing halos for city facilities (Hospitals 🏥, Fire Stations 🚒, Police Stations 🚓, Airports ✈️, Transit Stations 🚉, Incident Sites ⚠️).
+* **Live Emergency Vehicle Animation:** Real-time animated vehicles traveling along the shortest path with siren flashing effects (red/blue strobes), heading rotation, and speed profiles.
+* **Drag-and-Drop Positioning:** Click and drag any city location across the map in real-time.
+* **Dynamic Road Blockage & Obstacle Toggling:** Click on any road edge on the canvas to simulate accidents, road closures, or traffic blockades — triggering live recalculation of the all-pairs shortest paths.
+* **Automated Closest Unit Dispatch:** Uses the precomputed $O(1)$ all-pairs distance lookup matrix to find and dispatch the nearest available emergency response unit to any incident location.
 
-## Features
+### 2. ⚡ Floyd–Warshall Step-by-Step Dynamic Programming Visualizer
+* **Interactive Step Player:** Step Forward, Step Backward, Play, Pause, and Jump controls.
+* **Live Recurrence Formula Breakdown:** Displays the DP transition formula:
+  $$D^{(k)}[i][j] = \min\left(D^{(k-1)}[i][j],\, D^{(k-1)}[i][k] + D^{(k-1)}[k][j]\right)$$
+* **Color-Coded Matrix Highlighting:**
+  - 🟨 **Amber**: Currently evaluated cell $(i, j)$
+  - 🟩 **Emerald**: Cell updated with a shorter path via intermediate pivot $k$
+  - 🟦 **Blue & Cyan**: Intermediate path components $D[i][k]$ and $D[k][j]$
+  - 🟪 **Indigo**: Active pivot row and column $k$
 
-* Select a start location and destination.
-* View the reconstructed shortest route and total distance.
-* Inspect the direct-road matrix and all-pairs shortest-distance matrix.
-* Demonstrates route reconstruction using a `next` matrix.
-* Runs using only the Java standard library (Java Swing).
+### 3. 📋 Matrix Inspector & Route Reconstruction
+* **All-Pairs Shortest Distances ($D[i][j]$):** Complete distance table between every source and destination.
+* **Next-Hop Matrix ($\Pi[i][j]$):** Demonstrates path reconstruction in $O(L)$ time.
+* **Direct Road Network Matrix:** Underlying adjacency matrix representation.
 
-## Run the project
+### 4. 📊 DAA Research & Complexity Benchmarks
+* **Live Performance Profiling:** Microsecond runtime benchmarking comparing Floyd–Warshall against $V \times \text{Dijkstra}$.
+* **Theoretical Complexity Comparison:** Side-by-side comparison of Floyd–Warshall ($O(V^3)$), Dijkstra ($O((V+E)\log V)$), Bellman-Ford ($O(VE)$), and A* Search.
+* **Graph Topology Metrics:** Real-time calculation of Vertices $|V|$, Edges $|E|$, Graph Density, and Network Diameter.
 
-Open a terminal in this folder and run:
+---
 
+## 🚀 How to Run
+
+### Option 1: Quick Batch Script (Windows)
+Double-click `run.bat` or run:
+```powershell
+.\run.bat
+```
+
+### Option 2: Manual Terminal Commands
 ```powershell
 javac -d out src/*.java
 java -cp out Main
 ```
 
-Or, on Windows, simply double-click `run.bat`.
+*Requirements: Java SE Development Kit (JDK 8 or higher). Zero external dependencies required.*
 
-## Demo example
+---
 
-Choose **Central Hospital** as the starting location and **Accident Zone** as the destination. The application displays the shortest route and its distance. Open the **Direct Road Network** tab first to show that not all places have a direct road, then open **All-Pairs Shortest Distances** to show how Floyd–Warshall has calculated alternatives.
+## 🎮 Interactive Controls Guide
 
-## Explanation for presentation
+| Action | Control |
+|---|---|
+| **Select Start Location** | Left-click any node on the canvas or choose from the dropdown |
+| **Select Destination** | Right-click any node on the canvas or choose from the dropdown |
+| **Move Location** | Click and drag any node across the map |
+| **Toggle Road Blockage** | Click on any road segment / distance badge |
+| **Dispatch Vehicle** | Click **🚨 Dispatch Vehicle** |
+| **Nearest Service Dispatch** | Click **⚡ Closest Unit** |
+| **Inspect DP Steps** | Navigate to the **⚡ Floyd–Warshall DP Step Visualizer** tab and press **Play** |
 
-> This application models city locations as vertices and roads as weighted edges. The Floyd–Warshall algorithm repeatedly checks whether an intermediate location produces a shorter route between two locations. It stores both the shortest distance and the next location in the route. This is useful for emergency services because shortest routes for any pair of locations are already available when an emergency request arrives.
+---
 
-## Suggested GitHub upload
+## 📖 DAA Theoretical Concept for Presentation
 
-```powershell
-git init
-git add .
-git commit -m "Add Floyd-Warshall emergency route planner"
-```
+> In emergency dispatch systems, incident requests arrive unpredictably at any location in the city network. Rather than executing a single-source search (like Dijkstra) on every individual emergency call, the **Floyd–Warshall algorithm** precomputes the shortest path for all $V \times V$ pairs once in $O(V^3)$ time during initialization. When an emergency call occurs, the response system can immediately retrieve the optimal route and locate the closest response vehicle in $O(1)$ time, guaranteeing minimum response delay.
