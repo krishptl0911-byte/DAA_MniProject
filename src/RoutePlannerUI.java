@@ -6,11 +6,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 /**
  * Modern Emergency Dispatch Command Center UI.
  * Styled with Apple San Francisco typography and high-contrast tactile action buttons.
- * Integrates interactive 2D graph simulation, vehicle dispatch animation,
+ * Integrates an intricate 18-node metropolitan blueprint, realistic multi-hop emergency navigation,
  * step-by-step DP matrix inspector, matrix tabs, and DAA algorithm research analytics.
  */
 public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.RouteChangeListener {
@@ -136,7 +137,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         title.setFont(UITheme.fontBold(16f));
         title.setForeground(new Color(248, 113, 113));
 
-        JLabel sub = new JLabel("DAA Mini Project • All-Pairs Shortest Path Optimization with Floyd–Warshall Algorithm O(V³)");
+        JLabel sub = new JLabel("DAA Mini Project • Metropolitan All-Pairs Shortest Path Optimization with Floyd–Warshall O(V³)");
         sub.setFont(UITheme.font(12f));
         sub.setForeground(UITheme.TEXT_SECONDARY);
 
@@ -201,8 +202,8 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
 
         String[] locNames = cityGraph.getLocations();
         startBox = new JComboBox<>(locNames);
-        startBox.setFont(UITheme.font(12f));
-        startBox.setSelectedIndex(0); // Central Hospital
+        startBox.setFont(UITheme.font(11.5f));
+        startBox.setSelectedIndex(0); // Central Trauma Hospital
         startBox.addActionListener(e -> {
             if (visualizerPanel != null) {
                 updateRouteDisplay();
@@ -210,8 +211,8 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         });
 
         endBox = new JComboBox<>(locNames);
-        endBox.setFont(UITheme.font(12f));
-        endBox.setSelectedIndex(5); // Accident Zone
+        endBox.setFont(UITheme.font(11.5f));
+        endBox.setSelectedIndex(13); // International Airport
         endBox.addActionListener(e -> {
             if (visualizerPanel != null) {
                 updateRouteDisplay();
@@ -219,12 +220,12 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         });
 
         vehicleTypeBox = new JComboBox<>(EmergencyVehicle.VehicleType.values());
-        vehicleTypeBox.setFont(UITheme.font(12f));
+        vehicleTypeBox.setFont(UITheme.font(11.5f));
         vehicleTypeBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                setFont(UITheme.font(12f));
+                setFont(UITheme.font(11.5f));
                 if (value instanceof EmergencyVehicle.VehicleType) {
                     EmergencyVehicle.VehicleType vt = (EmergencyVehicle.VehicleType) value;
                     setText(vt.name + " (" + (int) vt.avgSpeedKmh + " km/h)");
@@ -238,7 +239,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         JPanel p1 = new JPanel(new BorderLayout(8, 0));
         p1.setOpaque(false);
         JLabel l1 = new JLabel("Start Base:");
-        l1.setFont(UITheme.font(12f));
+        l1.setFont(UITheme.font(11.5f));
         l1.setForeground(new Color(203, 213, 225));
         p1.add(l1, BorderLayout.WEST);
         p1.add(startBox, BorderLayout.CENTER);
@@ -247,7 +248,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         JPanel p2 = new JPanel(new BorderLayout(8, 0));
         p2.setOpaque(false);
         JLabel l2 = new JLabel("Destination:");
-        l2.setFont(UITheme.font(12f));
+        l2.setFont(UITheme.font(11.5f));
         l2.setForeground(new Color(203, 213, 225));
         p2.add(l2, BorderLayout.WEST);
         p2.add(endBox, BorderLayout.CENTER);
@@ -256,7 +257,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         JPanel p3 = new JPanel(new BorderLayout(8, 0));
         p3.setOpaque(false);
         JLabel l3 = new JLabel("Vehicle Unit:");
-        l3.setFont(UITheme.font(12f));
+        l3.setFont(UITheme.font(11.5f));
         l3.setForeground(new Color(203, 213, 225));
         p3.add(l3, BorderLayout.WEST);
         p3.add(vehicleTypeBox, BorderLayout.CENTER);
@@ -303,7 +304,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         metricsCard.add(etaBadgeLabel);
 
         routeSummaryLabel = new JLabel("Route: —");
-        routeSummaryLabel.setFont(UITheme.font(12f));
+        routeSummaryLabel.setFont(UITheme.font(11.5f));
         routeSummaryLabel.setForeground(new Color(226, 232, 240));
 
         JPanel summaryHolder = new JPanel(new BorderLayout(4, 4));
@@ -323,7 +324,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         turnByTurnList = new JList<>(turnByTurnListModel);
         turnByTurnList.setBackground(UITheme.BG_DARK_ROOT);
         turnByTurnList.setForeground(new Color(241, 245, 249));
-        turnByTurnList.setFont(UITheme.font(12f));
+        turnByTurnList.setFont(UITheme.font(11.5f));
         turnByTurnList.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
 
         JScrollPane navScroll = new JScrollPane(turnByTurnList);
@@ -379,16 +380,20 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         lbl.setForeground(new Color(56, 189, 248));
 
         p.add(lbl, BorderLayout.NORTH);
-        p.add(new JScrollPane(table), BorderLayout.CENTER);
+        JScrollPane scroll = new JScrollPane(table,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        p.add(scroll, BorderLayout.CENTER);
         return p;
     }
 
     private JTable createStyledTable() {
         JTable table = new JTable();
-        table.setRowHeight(24);
+        table.setRowHeight(22);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         
         JTableHeader th = table.getTableHeader();
-        th.setFont(UITheme.fontBold(11f));
+        th.setFont(UITheme.fontBold(10.5f));
         th.setBackground(UITheme.BG_DARK_ROOT);
         th.setForeground(new Color(241, 245, 249));
         th.setDefaultRenderer(new DefaultTableCellRenderer() {
@@ -397,7 +402,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setBackground(new Color(15, 23, 42));
                 setForeground(new Color(241, 245, 249));
-                setFont(UITheme.fontBold(11f));
+                setFont(UITheme.fontBold(10f));
                 setHorizontalAlignment(SwingConstants.CENTER);
                 setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, UITheme.BORDER_DARK));
                 return c;
@@ -414,11 +419,12 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
                 if (col == 0) {
                     setBackground(UITheme.BG_DARK_ROOT);
                     setForeground(new Color(56, 189, 248));
-                    setFont(UITheme.fontBold(11f));
+                    setFont(UITheme.fontBold(10.5f));
+                    setHorizontalAlignment(SwingConstants.LEFT);
                 } else {
                     setBackground(UITheme.BG_DARK_CARD);
                     setForeground(new Color(226, 232, 240));
-                    setFont(UITheme.font(11f));
+                    setFont(UITheme.font(10f));
                 }
                 return c;
             }
@@ -462,6 +468,23 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         directRoadTable.setModel(new DefaultTableModel(roadData, cols) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         });
+
+        setupTableColumns(distanceTable);
+        setupTableColumns(nextTable);
+        setupTableColumns(directRoadTable);
+    }
+
+    private void setupTableColumns(JTable table) {
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            TableColumn col = table.getColumnModel().getColumn(i);
+            if (i == 0) {
+                col.setPreferredWidth(160);
+                col.setMinWidth(140);
+            } else {
+                col.setPreferredWidth(85);
+                col.setMinWidth(75);
+            }
+        }
     }
 
     private void updateRouteDisplay() {
@@ -516,7 +539,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
             int to = path.get(i + 1);
             int segDist = roads[from][to];
             double segEta = (segDist / speed) * 60.0;
-            turnByTurnListModel.addElement(String.format("Step %d: Proceed from %s → %s (%d km, ~%.1f min)",
+            turnByTurnListModel.addElement(String.format("Step %d: %s → %s (%d km, ~%.1f min)",
                     i + 1, locs[from], locs[to], segDist, segEta));
         }
         turnByTurnListModel.addElement("Arrive at Target Incident Site: " + locs[end]);
@@ -553,7 +576,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         int bestNode = -1;
         int minDistance = CityGraph.INF;
 
-        // Find nearest emergency response base (Hospital, Fire Station, Police)
+        // Find nearest emergency response base (Hospitals, Fire Stations, Police)
         for (int i = 0; i < nodes.size(); i++) {
             CityGraph.LocationType type = nodes.get(i).type;
             if (type == CityGraph.LocationType.HOSPITAL ||

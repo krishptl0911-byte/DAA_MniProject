@@ -5,11 +5,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 /**
  * Step-by-Step Floyd-Warshall DP Matrix Transformation Inspector.
  * Demonstrates the DAA concept with Apple typography, high-contrast playback controls,
- * cell highlighting, and live recurrence formula evaluation.
+ * cell highlighting, and live recurrence formula evaluation across the 18-node metropolitan network.
  */
 public class AlgorithmVisualizerPanel extends JPanel {
     private final CityGraph graph;
@@ -71,7 +72,9 @@ public class AlgorithmVisualizerPanel extends JPanel {
 
         // Center Matrix Table
         createMatrixTable();
-        JScrollPane scrollPane = new JScrollPane(matrixTable);
+        JScrollPane scrollPane = new JScrollPane(matrixTable,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getViewport().setBackground(UITheme.BG_DARK_ROOT);
         scrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER_DARK, 1));
 
@@ -95,7 +98,7 @@ public class AlgorithmVisualizerPanel extends JPanel {
         explanationArea.setEditable(false);
         explanationArea.setLineWrap(true);
         explanationArea.setWrapStyleWord(true);
-        explanationArea.setFont(UITheme.font(13f));
+        explanationArea.setFont(UITheme.font(12f));
         explanationArea.setBackground(UITheme.BG_DARK_ROOT);
         explanationArea.setForeground(new Color(226, 232, 240));
         explanationArea.setBorder(BorderFactory.createCompoundBorder(
@@ -140,7 +143,7 @@ public class AlgorithmVisualizerPanel extends JPanel {
         JLabel speedLabel = new JLabel("Speed:");
         speedLabel.setFont(UITheme.fontBold(11f));
         speedLabel.setForeground(new Color(203, 213, 225));
-        speedSlider = new JSlider(50, 1000, 300);
+        speedSlider = new JSlider(10, 500, 100);
         speedSlider.setOpaque(false);
         speedSlider.setPreferredSize(new Dimension(90, 24));
         speedSlider.addChangeListener(e -> {
@@ -186,11 +189,11 @@ public class AlgorithmVisualizerPanel extends JPanel {
         };
 
         matrixTable = new JTable(tableModel);
-        matrixTable.setRowHeight(32);
-        matrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        matrixTable.setRowHeight(26);
+        matrixTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         
         JTableHeader th = matrixTable.getTableHeader();
-        th.setFont(UITheme.fontBold(12f));
+        th.setFont(UITheme.fontBold(11f));
         th.setBackground(UITheme.BG_DARK_CARD);
         th.setForeground(new Color(241, 245, 249));
         th.setDefaultRenderer(new DefaultTableCellRenderer() {
@@ -199,12 +202,24 @@ public class AlgorithmVisualizerPanel extends JPanel {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setBackground(new Color(15, 23, 42));
                 setForeground(new Color(241, 245, 249));
-                setFont(UITheme.fontBold(11f));
+                setFont(UITheme.fontBold(10.5f));
                 setHorizontalAlignment(SwingConstants.CENTER);
                 setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, UITheme.BORDER_DARK));
                 return c;
             }
         });
+
+        // Configure column widths for horizontal scrolling
+        for (int i = 0; i < matrixTable.getColumnCount(); i++) {
+            TableColumn col = matrixTable.getColumnModel().getColumn(i);
+            if (i == 0) {
+                col.setPreferredWidth(160);
+                col.setMinWidth(140);
+            } else {
+                col.setPreferredWidth(85);
+                col.setMinWidth(75);
+            }
+        }
 
         matrixTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
@@ -213,12 +228,13 @@ public class AlgorithmVisualizerPanel extends JPanel {
                                                             int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setHorizontalAlignment(SwingConstants.CENTER);
-                setFont(UITheme.font(12f));
+                setFont(UITheme.font(11f));
 
                 if (column == 0) {
                     setBackground(UITheme.BG_DARK_CARD);
                     setForeground(new Color(56, 189, 248));
-                    setFont(UITheme.fontBold(12f));
+                    setFont(UITheme.fontBold(11f));
+                    setHorizontalAlignment(SwingConstants.LEFT);
                     return c;
                 }
 
@@ -235,22 +251,22 @@ public class AlgorithmVisualizerPanel extends JPanel {
                         if (snap.updated) {
                             setBackground(new Color(16, 185, 129)); // Bright Emerald Green (Updated!)
                             setForeground(Color.WHITE);
-                            setFont(UITheme.fontBold(13f));
+                            setFont(UITheme.fontBold(11.5f));
                         } else {
                             setBackground(new Color(245, 158, 11)); // Amber (Evaluating)
                             setForeground(Color.BLACK);
-                            setFont(UITheme.fontBold(13f));
+                            setFont(UITheme.fontBold(11.5f));
                         }
                     } else if (row == i && jCol == k) {
                         // Cell D[i][k]
                         setBackground(new Color(59, 130, 246)); // Blue
                         setForeground(Color.WHITE);
-                        setFont(UITheme.fontBold(12f));
+                        setFont(UITheme.fontBold(11f));
                     } else if (row == k && jCol == j) {
                         // Cell D[k][j]
                         setBackground(new Color(6, 182, 212)); // Cyan
                         setForeground(Color.BLACK);
-                        setFont(UITheme.fontBold(12f));
+                        setFont(UITheme.fontBold(11f));
                     } else if (row == k || jCol == k) {
                         // Pivot Row/Col k
                         setBackground(new Color(30, 58, 138, 100));
@@ -292,7 +308,7 @@ public class AlgorithmVisualizerPanel extends JPanel {
             }
         }
 
-        stepInfoLabel.setText(String.format("Step %d / %d (Pivot Intermediate Node k=%s)",
+        stepInfoLabel.setText(String.format("Step %d / %d (Pivot k=%s)",
                 currentStepIndex, steps.size() - 1,
                 (snap.k != -1 ? locations[snap.k] : "None")));
 

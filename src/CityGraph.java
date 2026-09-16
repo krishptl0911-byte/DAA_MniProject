@@ -5,7 +5,8 @@ import java.util.List;
 
 /**
  * Stores city locations, coordinates, categories, and direct road connections.
- * Supports dynamic edge weight updates, road blockages, and custom graph expansion.
+ * Supports a realistic 18-node metropolitan blueprint with multi-hop express bypasses,
+ * bridge bottlenecks, multiple emergency response hubs, and dynamic blockages.
  */
 public class CityGraph {
     public static final int INF = 999999;
@@ -13,13 +14,13 @@ public class CityGraph {
     public enum LocationType {
         HOSPITAL("Hospital", "🏥", 0xE53935),
         FIRE_STATION("Fire Station", "🚒", 0xF4511E),
-        POLICE_STATION("Police Station", "🚓", 0x1E88E5),
+        POLICE_STATION("Police HQ", "🚓", 0x1E88E5),
         CITY_CENTER("City Center", "🏢", 0x8E24AA),
-        RAILWAY_STATION("Railway Station", "🚉", 0x00897B),
+        RAILWAY_STATION("Transit Hub", "🚉", 0x00897B),
         ACCIDENT_ZONE("Incident Site", "⚠️", 0xFB8C00),
         AIRPORT("Airport", "✈️", 0x3949AB),
         UNIVERSITY("University", "🎓", 0x43A047),
-        RESIDENTIAL("Residential", "🏘️", 0x6D4C41);
+        RESIDENTIAL("District", "🏘️", 0x6D4C41);
 
         public final String label;
         public final String icon;
@@ -57,36 +58,82 @@ public class CityGraph {
 
     public void loadDefaultMetroCity() {
         nodes.clear();
-        nodes.add(new CityNode("Central Hospital", LocationType.HOSPITAL, 140, 160));
-        nodes.add(new CityNode("Fire Station", LocationType.FIRE_STATION, 400, 100));
-        nodes.add(new CityNode("Police Station", LocationType.POLICE_STATION, 160, 420));
-        nodes.add(new CityNode("City Center", LocationType.CITY_CENTER, 420, 290));
-        nodes.add(new CityNode("Railway Station", LocationType.RAILWAY_STATION, 660, 140));
-        nodes.add(new CityNode("Accident Zone", LocationType.ACCIDENT_ZONE, 430, 490));
-        nodes.add(new CityNode("Airport", LocationType.AIRPORT, 720, 430));
-        nodes.add(new CityNode("University", LocationType.UNIVERSITY, 270, 270));
+        // 18 Metropolitan Locations with clean spatial layout across 5 distinct city sectors
+        nodes.add(new CityNode("Central Trauma Hospital", LocationType.HOSPITAL, 110, 110));      // 0
+        nodes.add(new CityNode("Mountain Valley Tunnel", LocationType.ACCIDENT_ZONE, 240, 160));     // 1
+        nodes.add(new CityNode("Central Fire Station 1", LocationType.FIRE_STATION, 380, 110));     // 2
+        nodes.add(new CityNode("North Heights District", LocationType.RESIDENTIAL, 380, 42));       // 3
+        nodes.add(new CityNode("Suburban Fire Station 2", LocationType.FIRE_STATION, 570, 65));     // 4
+        nodes.add(new CityNode("Harbor Cargo Terminal", LocationType.RAILWAY_STATION, 740, 130));    // 5
+        nodes.add(new CityNode("Downtown Financial Plaza", LocationType.CITY_CENTER, 360, 240));    // 6
+        nodes.add(new CityNode("River Suspension Bridge", LocationType.RESIDENTIAL, 510, 250));     // 7
+        nodes.add(new CityNode("Grand Central Transit", LocationType.RAILWAY_STATION, 560, 170));   // 8
+        nodes.add(new CityNode("West Bay Commercial Hub", LocationType.RESIDENTIAL, 75, 280));      // 9
+        nodes.add(new CityNode("Metro Police HQ", LocationType.POLICE_STATION, 190, 310));          // 10
+        nodes.add(new CityNode("Highway 101 Incident Site", LocationType.ACCIDENT_ZONE, 330, 420)); // 11
+        nodes.add(new CityNode("Industrial Tech Park", LocationType.CITY_CENTER, 480, 370));        // 12
+        nodes.add(new CityNode("International Airport", LocationType.AIRPORT, 740, 310));           // 13
+        nodes.add(new CityNode("Metropolitan University", LocationType.UNIVERSITY, 130, 470));      // 14
+        nodes.add(new CityNode("South Waterfront Hospital", LocationType.HOSPITAL, 460, 490));      // 15
+        nodes.add(new CityNode("East Riverfront Suburb", LocationType.RESIDENTIAL, 610, 460));      // 16
+        nodes.add(new CityNode("Express Bypass Junction", LocationType.CITY_CENTER, 730, 430));     // 17
 
         int n = nodes.size();
         baseRoads = new int[n][n];
         for (int[] row : baseRoads) Arrays.fill(row, INF);
         for (int i = 0; i < n; i++) baseRoads[i][i] = 0;
 
-        // Symmetric undirected edges
-        addInitialEdge(0, 1, 4);  // Central Hospital <-> Fire Station (4 km)
-        addInitialEdge(0, 2, 6);  // Central Hospital <-> Police Station (6 km)
-        addInitialEdge(0, 3, 3);  // Central Hospital <-> City Center (3 km)
-        addInitialEdge(0, 7, 7);  // Central Hospital <-> University (7 km)
-        addInitialEdge(1, 2, 3);  // Fire Station <-> Police Station (3 km)
-        addInitialEdge(1, 4, 8);  // Fire Station <-> Railway Station (8 km)
-        addInitialEdge(2, 3, 2);  // Police Station <-> City Center (2 km)
-        addInitialEdge(2, 5, 7);  // Police Station <-> Accident Zone (7 km)
-        addInitialEdge(3, 4, 5);  // City Center <-> Railway Station (5 km)
-        addInitialEdge(3, 6, 10); // City Center <-> Airport (10 km)
-        addInitialEdge(3, 7, 4);  // City Center <-> University (4 km)
-        addInitialEdge(4, 5, 3);  // Railway Station <-> Accident Zone (3 km)
-        addInitialEdge(5, 6, 6);  // Accident Zone <-> Airport (6 km)
-        addInitialEdge(5, 7, 5);  // Accident Zone <-> University (5 km)
-        addInitialEdge(6, 7, 8);  // Airport <-> University (8 km)
+        // 43 Symmetric Interconnected Road Segments with Realistic Weights & Bottlenecks
+        // North & West Sector
+        addInitialEdge(0, 1, 4);   // Central Hospital <-> Mountain Tunnel (4 km)
+        addInitialEdge(0, 3, 9);   // Central Hospital <-> North Heights (9 km)
+        addInitialEdge(0, 9, 7);   // Central Hospital <-> West Bay (7 km)
+        addInitialEdge(1, 2, 3);   // Mountain Tunnel <-> Fire Station 1 (3 km)
+        addInitialEdge(1, 6, 5);   // Mountain Tunnel <-> Downtown Plaza (5 km)
+        addInitialEdge(1, 10, 4);  // Mountain Tunnel <-> Police HQ (4 km)
+        addInitialEdge(2, 3, 3);   // Fire Station 1 <-> North Heights (3 km)
+        addInitialEdge(2, 4, 6);   // Fire Station 1 <-> Fire Station 2 (6 km)
+        addInitialEdge(2, 6, 4);   // Fire Station 1 <-> Downtown Plaza (4 km)
+        addInitialEdge(3, 4, 5);   // North Heights <-> Fire Station 2 (5 km)
+
+        // Northeast & Harbor Sector
+        addInitialEdge(4, 5, 5);   // Fire Station 2 <-> Harbor Terminal (5 km)
+        addInitialEdge(4, 8, 4);   // Fire Station 2 <-> Grand Central (4 km)
+        addInitialEdge(5, 8, 4);   // Harbor Terminal <-> Grand Central (4 km)
+        addInitialEdge(5, 13, 8);  // Harbor Terminal <-> Airport (8 km)
+        addInitialEdge(6, 7, 4);   // Downtown Plaza <-> River Bridge (4 km)
+        addInitialEdge(6, 10, 3);  // Downtown Plaza <-> Police HQ (3 km)
+        addInitialEdge(6, 11, 6);  // Downtown Plaza <-> Highway 101 (6 km)
+        addInitialEdge(6, 12, 5);  // Downtown Plaza <-> Industrial Tech (5 km)
+        addInitialEdge(7, 8, 3);   // River Bridge <-> Grand Central (3 km)
+        addInitialEdge(7, 12, 4);  // River Bridge <-> Industrial Tech (4 km)
+        addInitialEdge(7, 13, 7);  // River Bridge <-> Airport (7 km)
+        addInitialEdge(7, 16, 8);  // River Bridge <-> East Riverfront (8 km)
+        addInitialEdge(8, 13, 6);  // Grand Central <-> Airport (6 km)
+
+        // Southwest & University Sector
+        addInitialEdge(9, 10, 3);  // West Bay <-> Police HQ (3 km)
+        addInitialEdge(9, 14, 6);  // West Bay <-> University (6 km)
+        addInitialEdge(10, 11, 4); // Police HQ <-> Highway 101 (4 km)
+        addInitialEdge(10, 14, 5); // Police HQ <-> University (5 km)
+        addInitialEdge(11, 12, 4); // Highway 101 <-> Industrial Tech (4 km)
+        addInitialEdge(11, 14, 4); // Highway 101 <-> University (4 km)
+        addInitialEdge(11, 15, 3); // Highway 101 <-> South Hospital (3 km)
+        addInitialEdge(14, 15, 7); // University <-> South Hospital (7 km)
+
+        // Southeast & Express Bypass Sector
+        addInitialEdge(12, 15, 4); // Industrial Tech <-> South Hospital (4 km)
+        addInitialEdge(12, 16, 5); // Industrial Tech <-> East Riverfront (5 km)
+        addInitialEdge(12, 17, 7); // Industrial Tech <-> Express Bypass (7 km)
+        addInitialEdge(13, 16, 6); // Airport <-> East Riverfront (6 km)
+        addInitialEdge(13, 17, 4); // Airport <-> Express Bypass (4 km)
+        addInitialEdge(15, 16, 4); // South Hospital <-> East Riverfront (4 km)
+        addInitialEdge(16, 17, 3); // East Riverfront <-> Express Bypass (3 km)
+
+        // Strategic long-distance direct arteries (Congested direct routes vs smart bypasses)
+        addInitialEdge(0, 6, 9);   // Central Hospital <-> Downtown (Direct Congested: 9 km vs Tunnel 4+5=9 km)
+        addInitialEdge(8, 12, 7);  // Grand Central <-> Industrial Tech (7 km)
+        addInitialEdge(10, 15, 8); // Police HQ <-> South Hospital (8 km)
 
         blockedRoads = new boolean[n][n];
         recalculateCurrentRoads();
