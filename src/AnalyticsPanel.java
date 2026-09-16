@@ -4,11 +4,13 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 /**
  * DAA Academic Research & Analytics Dashboard.
  * Presents comparative algorithm analysis (Floyd-Warshall vs Dijkstra vs Bellman-Ford vs A*),
  * live benchmark profiling, graph network topology metrics, and DP theory.
+ * Styled with Apple San Francisco typography and Apple high-contrast buttons.
  */
 public class AnalyticsPanel extends JPanel {
     private final CityGraph graph;
@@ -25,7 +27,7 @@ public class AnalyticsPanel extends JPanel {
     public AnalyticsPanel(CityGraph graph) {
         this.graph = graph;
         setLayout(new BorderLayout(14, 14));
-        setBackground(new Color(15, 23, 42));
+        setBackground(UITheme.BG_DARK_ROOT);
         setBorder(new EmptyBorder(14, 14, 14, 14));
 
         buildUI();
@@ -36,16 +38,13 @@ public class AnalyticsPanel extends JPanel {
         // Top Header
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
-        JLabel title = new JLabel("📊 DAA Algorithm Analytics, Complexity & Performance Profiling");
-        title.setFont(new Font("SansSerif", Font.BOLD, 18));
+        JLabel title = new JLabel("DAA Algorithm Analytics, Complexity & Performance Profiling");
+        title.setFont(UITheme.fontBold(17f));
         title.setForeground(new Color(56, 189, 248));
         headerPanel.add(title, BorderLayout.WEST);
 
-        JButton benchmarkBtn = new JButton("⚡ Run Live Benchmark");
-        benchmarkBtn.setFont(new Font("SansSerif", Font.BOLD, 12));
-        benchmarkBtn.setBackground(new Color(16, 185, 129));
-        benchmarkBtn.setForeground(Color.WHITE);
-        benchmarkBtn.setFocusPainted(false);
+        UITheme.AppleButton benchmarkBtn = UITheme.createSuccessButton("Run Live Benchmark");
+        benchmarkBtn.setFont(UITheme.fontBold(12f));
         benchmarkBtn.addActionListener(e -> refreshMetrics());
         headerPanel.add(benchmarkBtn, BorderLayout.EAST);
 
@@ -78,14 +77,14 @@ public class AnalyticsPanel extends JPanel {
 
         // Algorithm Comparison Table
         JPanel tableContainer = new JPanel(new BorderLayout(6, 6));
-        tableContainer.setBackground(new Color(30, 41, 59));
+        tableContainer.setBackground(UITheme.BG_DARK_CARD);
         tableContainer.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+                BorderFactory.createLineBorder(UITheme.BORDER_DARK, 1),
                 new EmptyBorder(8, 8, 8, 8)
         ));
 
         JLabel tableTitle = new JLabel("Theoretical Complexity & Feature Comparison");
-        tableTitle.setFont(new Font("SansSerif", Font.BOLD, 13));
+        tableTitle.setFont(UITheme.fontBold(13f));
         tableTitle.setForeground(new Color(241, 245, 249));
         tableContainer.add(tableTitle, BorderLayout.NORTH);
 
@@ -97,25 +96,25 @@ public class AnalyticsPanel extends JPanel {
 
         // Lower Section: DAA Dynamic Programming Formulation Card
         JPanel dpTheoryCard = new JPanel(new BorderLayout(8, 8));
-        dpTheoryCard.setBackground(new Color(30, 41, 59));
+        dpTheoryCard.setBackground(UITheme.BG_DARK_CARD);
         dpTheoryCard.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+                BorderFactory.createLineBorder(UITheme.BORDER_DARK, 1),
                 new EmptyBorder(10, 12, 10, 12)
         ));
 
-        JLabel theoryTitle = new JLabel("🧠 Dynamic Programming Formulation & Design Principles (Floyd–Warshall)");
-        theoryTitle.setFont(new Font("SansSerif", Font.BOLD, 14));
+        JLabel theoryTitle = new JLabel("Dynamic Programming Formulation & Design Principles (Floyd–Warshall)");
+        theoryTitle.setFont(UITheme.fontBold(14f));
         theoryTitle.setForeground(new Color(250, 204, 21));
 
         mathematicalProofArea = new JTextArea();
         mathematicalProofArea.setEditable(false);
         mathematicalProofArea.setLineWrap(true);
         mathematicalProofArea.setWrapStyleWord(true);
-        mathematicalProofArea.setFont(new Font("Consolas", Font.PLAIN, 12));
-        mathematicalProofArea.setBackground(new Color(15, 23, 42));
+        mathematicalProofArea.setFont(UITheme.fontMono(Font.PLAIN, 12f));
+        mathematicalProofArea.setBackground(UITheme.BG_DARK_ROOT);
         mathematicalProofArea.setForeground(new Color(226, 232, 240));
         mathematicalProofArea.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(51, 65, 85), 1),
+                BorderFactory.createLineBorder(UITheme.BORDER_DARK, 1),
                 new EmptyBorder(8, 10, 8, 10)
         ));
 
@@ -130,18 +129,18 @@ public class AnalyticsPanel extends JPanel {
 
     private JLabel createMetricCard(JPanel parent, String title, String initialValue, Color accent) {
         JPanel card = new JPanel(new BorderLayout(4, 4));
-        card.setBackground(new Color(30, 41, 59));
+        card.setBackground(UITheme.BG_DARK_CARD);
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(accent, 1),
                 new EmptyBorder(8, 10, 8, 10)
         ));
 
         JLabel titleLbl = new JLabel(title);
-        titleLbl.setFont(new Font("SansSerif", Font.PLAIN, 11));
-        titleLbl.setForeground(new Color(148, 163, 184));
+        titleLbl.setFont(UITheme.font(11f));
+        titleLbl.setForeground(UITheme.TEXT_SECONDARY);
 
         JLabel valLbl = new JLabel(initialValue);
-        valLbl.setFont(new Font("SansSerif", Font.BOLD, 14));
+        valLbl.setFont(UITheme.fontBold(14f));
         valLbl.setForeground(accent);
 
         card.add(titleLbl, BorderLayout.NORTH);
@@ -163,17 +162,31 @@ public class AnalyticsPanel extends JPanel {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         });
         table.setRowHeight(24);
-        table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 11));
-        table.getTableHeader().setBackground(new Color(15, 23, 42));
-        table.getTableHeader().setForeground(new Color(241, 245, 249));
+        
+        JTableHeader th = table.getTableHeader();
+        th.setFont(UITheme.fontBold(11f));
+        th.setBackground(UITheme.BG_DARK_ROOT);
+        th.setForeground(new Color(241, 245, 249));
+        th.setDefaultRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setBackground(new Color(15, 23, 42));
+                setForeground(new Color(241, 245, 249));
+                setFont(UITheme.fontBold(11f));
+                setHorizontalAlignment(SwingConstants.CENTER);
+                setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, UITheme.BORDER_DARK));
+                return c;
+            }
+        });
 
         table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSel, boolean hasFocus, int r, int c) {
                 Component comp = super.getTableCellRendererComponent(table, value, isSel, hasFocus, r, c);
-                setBackground(r == 0 ? new Color(30, 58, 138, 80) : new Color(30, 41, 59));
+                setBackground(r == 0 ? new Color(30, 58, 138, 80) : UITheme.BG_DARK_CARD);
                 setForeground(r == 0 ? new Color(147, 197, 253) : new Color(226, 232, 240));
-                setFont(new Font("SansSerif", r == 0 ? Font.BOLD : Font.PLAIN, 11));
+                setFont(r == 0 ? UITheme.fontBold(11f) : UITheme.font(11f));
                 return comp;
             }
         });
@@ -222,8 +235,6 @@ public class AnalyticsPanel extends JPanel {
                 }
             }
         }
-
-        double avgDistance = reachablePairs > 0 ? ((double) sumDistances / reachablePairs) : 0;
 
         verticesLabel.setText(n + " Locations");
         edgesLabel.setText(edgeCount + " Active Roads");

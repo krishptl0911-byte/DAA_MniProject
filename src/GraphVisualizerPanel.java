@@ -8,7 +8,8 @@ import javax.swing.*;
 /**
  * High-performance 2D Interactive Canvas for City Road Network Visualization.
  * Features glowing shortest path overlays, animated emergency vehicles,
- * siren strobe effects, interactive road blockage toggles, and drag-and-drop node placement.
+ * siren strobe effects, interactive road blockage toggles, drag-and-drop node placement,
+ * and Apple San Francisco typography.
  */
 public class GraphVisualizerPanel extends JPanel {
     private final CityGraph graph;
@@ -35,7 +36,7 @@ public class GraphVisualizerPanel extends JPanel {
 
     public GraphVisualizerPanel(CityGraph graph) {
         this.graph = graph;
-        setBackground(new Color(15, 23, 42)); // Slate Navy Dark Theme
+        setBackground(UITheme.BG_DARK_ROOT); // Slate Navy Dark Theme
         setDoubleBuffered(true);
 
         setupMouseInteractivity();
@@ -257,9 +258,8 @@ public class GraphVisualizerPanel extends JPanel {
     }
 
     private void drawDistanceBadge(Graphics2D g2, int x, int y, int distance, boolean isBlocked, boolean isHovered) {
-        String text = isBlocked ? "⛔ BLOCKED" : (distance + " km");
-        Font font = new Font("SansSerif", Font.BOLD, 10);
-        g2.setFont(font);
+        String text = isBlocked ? "BLOCKED" : (distance + " km");
+        g2.setFont(UITheme.fontBold(10f));
         FontMetrics fm = g2.getFontMetrics();
         int strW = fm.stringWidth(text);
         int strH = fm.getHeight();
@@ -388,7 +388,7 @@ public class GraphVisualizerPanel extends JPanel {
     private void drawNodeLabel(Graphics2D g2, CityGraph.CityNode node, int index, boolean isStart, boolean isEnd) {
         String tag = isStart ? " [START]" : (isEnd ? " [DEST]" : "");
         String text = node.name + tag;
-        g2.setFont(new Font("SansSerif", isStart || isEnd ? Font.BOLD : Font.PLAIN, 11));
+        g2.setFont(isStart || isEnd ? UITheme.fontBold(11f) : UITheme.font(11f));
         FontMetrics fm = g2.getFontMetrics();
         int textW = fm.stringWidth(text);
         int textH = fm.getHeight();
@@ -466,9 +466,9 @@ public class GraphVisualizerPanel extends JPanel {
 
             // Floating status badge above vehicle
             String statusText = v.getStatus() == EmergencyVehicle.Status.ON_SCENE
-                    ? "✓ ARRIVED ON SCENE"
+                    ? "ARRIVED ON SCENE"
                     : String.format("%s (%.0f km/h)", v.getType().name, v.getType().avgSpeedKmh);
-            g2.setFont(new Font("SansSerif", Font.BOLD, 10));
+            g2.setFont(UITheme.fontBold(10f));
             FontMetrics vfm = g2.getFontMetrics();
             int vtw = vfm.stringWidth(statusText);
             g2.setColor(new Color(15, 23, 42, 210));
@@ -481,30 +481,30 @@ public class GraphVisualizerPanel extends JPanel {
     private void drawOverlayHUD(Graphics2D g2, int w, int h) {
         // Top Left Status Badge
         g2.setColor(new Color(15, 23, 42, 220));
-        g2.fillRoundRect(12, 12, 260, 42, 10, 10);
-        g2.setColor(new Color(51, 65, 85));
+        g2.fillRoundRect(12, 12, 270, 44, 10, 10);
+        g2.setColor(UITheme.BORDER_DARK);
         g2.setStroke(new BasicStroke(1.2f));
-        g2.drawRoundRect(12, 12, 260, 42, 10, 10);
+        g2.drawRoundRect(12, 12, 270, 44, 10, 10);
 
         // Green live indicator dot
         g2.setColor(new Color(16, 185, 129));
-        g2.fillOval(24, 27, 10, 10);
+        g2.fillOval(24, 28, 10, 10);
 
-        g2.setFont(new Font("SansSerif", Font.BOLD, 12));
+        g2.setFont(UITheme.fontBold(12f));
         g2.setColor(new Color(241, 245, 249));
-        g2.drawString("LIVE 911 CITY GRID SIMULATION", 42, 27);
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 10));
-        g2.setColor(new Color(148, 163, 184));
-        g2.drawString("Floyd–Warshall O(V³) Real-Time Matrix Active", 42, 44);
+        g2.drawString("LIVE 911 CITY GRID SIMULATION", 42, 28);
+        g2.setFont(UITheme.font(10f));
+        g2.setColor(UITheme.TEXT_SECONDARY);
+        g2.drawString("Floyd–Warshall O(V³) Real-Time Matrix Active", 42, 45);
 
         // Bottom Left Interactive Controls Guide
         g2.setColor(new Color(15, 23, 42, 220));
-        g2.fillRoundRect(12, h - 38, 540, 26, 8, 8);
-        g2.setColor(new Color(51, 65, 85));
-        g2.drawRoundRect(12, h - 38, 540, 26, 8, 8);
+        g2.fillRoundRect(12, h - 38, 590, 26, 8, 8);
+        g2.setColor(UITheme.BORDER_DARK);
+        g2.drawRoundRect(12, h - 38, 590, 26, 8, 8);
 
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        g2.setFont(UITheme.font(11f));
         g2.setColor(new Color(203, 213, 225));
-        g2.drawString("🖱️ Left-Click Node: Start | Right-Click: Destination | Click Road: Block/Unblock | Drag to move", 20, h - 21);
+        g2.drawString("Left-Click: Start  |  Right-Click: Dest  |  Click Road: Block/Unblock  |  Drag: Move node", 20, h - 21);
     }
 }
