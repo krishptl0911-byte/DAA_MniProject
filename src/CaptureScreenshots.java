@@ -14,7 +14,7 @@ public class CaptureScreenshots {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ignored) {}
 
-        File outDir = new File("C:/Users/intel/.gemini/antigravity/brain/01cdbe71-51c0-4798-b5a5-1510556e383a");
+        File outDir = new File("screenshots");
         if (!outDir.exists()) outDir.mkdirs();
 
         RoutePlannerUI ui = new RoutePlannerUI();
@@ -29,23 +29,17 @@ public class CaptureScreenshots {
         Thread.sleep(300);
         captureWindow(ui, new File(outDir, "tab1_map_dispatch.png"));
 
-        // 2. Capture Step Visualizer (Tab 1)
+        // 2. Capture Route Data (Tab 1)
         if (tabbedPane != null) tabbedPane.setSelectedIndex(1);
         ui.repaint();
         Thread.sleep(300);
-        captureWindow(ui, new File(outDir, "tab2_dp_visualizer.png"));
+        captureWindow(ui, new File(outDir, "tab2_route_data.png"));
 
-        // 3. Capture Matrices (Tab 2)
+        // 3. Capture Analytics (Tab 2)
         if (tabbedPane != null) tabbedPane.setSelectedIndex(2);
         ui.repaint();
         Thread.sleep(300);
-        captureWindow(ui, new File(outDir, "tab3_matrices.png"));
-
-        // 4. Capture Analytics (Tab 3)
-        if (tabbedPane != null) tabbedPane.setSelectedIndex(3);
-        ui.repaint();
-        Thread.sleep(300);
-        captureWindow(ui, new File(outDir, "tab4_analytics.png"));
+        captureWindow(ui, new File(outDir, "tab3_analytics.png"));
 
         System.out.println("Screenshots captured successfully!");
         ui.dispose();

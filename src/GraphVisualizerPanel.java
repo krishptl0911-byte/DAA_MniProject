@@ -6,10 +6,8 @@ import java.util.List;
 import javax.swing.*;
 
 /**
- * High-performance 2D Interactive Canvas for City Road Network Visualization.
- * Features glowing shortest path overlays, animated emergency vehicles,
- * siren strobe effects, interactive road blockage toggles, drag-and-drop node placement,
- * and Apple San Francisco typography scaled for metropolitan blueprints.
+ * Interactive, map-style city canvas for the dispatch simulation. It deliberately keeps
+ * every road selectable so that the route algorithm can react to a live closure.
  */
 public class GraphVisualizerPanel extends JPanel {
     private final CityGraph graph;
@@ -36,7 +34,7 @@ public class GraphVisualizerPanel extends JPanel {
 
     public GraphVisualizerPanel(CityGraph graph) {
         this.graph = graph;
-        setBackground(UITheme.BG_DARK_ROOT); // Slate Navy Dark Theme
+        setBackground(new Color(232, 234, 237));
         setDoubleBuffered(true);
 
         setupMouseInteractivity();
@@ -179,7 +177,7 @@ public class GraphVisualizerPanel extends JPanel {
         int w = getWidth();
         int h = getHeight();
 
-        // 1. Draw subtle background grid
+        // 1. Draw a clean street-map baselayer (offline, so no API key is required).
         drawBackgroundGrid(g2, w, h);
 
         // 2. Draw all road edges
@@ -201,13 +199,29 @@ public class GraphVisualizerPanel extends JPanel {
     }
 
     private void drawBackgroundGrid(Graphics2D g2, int w, int h) {
-        g2.setColor(new Color(30, 41, 59, 100));
-        int gridSpacing = 35;
-        for (int x = 0; x < w; x += gridSpacing) {
-            for (int y = 0; y < h; y += gridSpacing) {
-                g2.fillRect(x - 1, y - 1, 2, 2);
-            }
-        }
+        // Google Maps-inspired neutral land, water, parks and secondary streets.
+        g2.setColor(new Color(242, 241, 236));
+        g2.fillRect(0, 0, w, h);
+
+        g2.setColor(new Color(198, 225, 237));
+        g2.fillRoundRect(w - 115, 0, 115, h, 26, 26);
+        g2.setColor(new Color(215, 232, 203));
+        g2.fillRoundRect(18, h - 155, 172, 120, 28, 28);
+        g2.fillRoundRect(w / 2 - 70, 18, 150, 66, 24, 24);
+        g2.setColor(new Color(190, 207, 179));
+        g2.setStroke(new BasicStroke(1f));
+        g2.drawRoundRect(18, h - 155, 172, 120, 28, 28);
+
+        g2.setColor(new Color(221, 222, 224));
+        g2.setStroke(new BasicStroke(1f));
+        for (int x = 20; x < w; x += 46) g2.drawLine(x, 0, x, h);
+        for (int y = 18; y < h; y += 38) g2.drawLine(0, y, w, y);
+
+        g2.setFont(UITheme.fontBold(10f));
+        g2.setColor(new Color(125, 154, 115));
+        g2.drawString("METRO GREENWAY", 38, h - 54);
+        g2.setColor(new Color(92, 150, 177));
+        g2.drawString("EAST RIVER", w - 97, 28);
     }
 
     private void drawRoadEdges(Graphics2D g2) {
@@ -225,12 +239,12 @@ public class GraphVisualizerPanel extends JPanel {
                 boolean isHovered = (hoveredEdge != null &&
                         ((hoveredEdge[0] == i && hoveredEdge[1] == j) || (hoveredEdge[0] == j && hoveredEdge[1] == i)));
 
-                // Road outer border / bed
-                g2.setStroke(new BasicStroke(isHovered ? 5.5f : 4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                // A pale asphalt bed and white carriageway make the network read as a map.
+                g2.setStroke(new BasicStroke(isHovered ? 9f : 7f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
                 if (isBlocked) {
-                    g2.setColor(new Color(185, 28, 28, 160)); // Crimson Red for blocked
+                    g2.setColor(new Color(217, 83, 79));
                 } else {
-                    g2.setColor(new Color(51, 65, 85, 180)); // Dark Steel
+                    g2.setColor(new Color(188, 190, 192));
                 }
                 g2.drawLine(u.x, u.y, v.x, v.y);
 
@@ -240,11 +254,11 @@ public class GraphVisualizerPanel extends JPanel {
                     Stroke dashed = new BasicStroke(2f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
                             0, new float[]{5, 5}, pulsePhase * 4);
                     g2.setStroke(dashed);
-                    g2.setColor(new Color(239, 68, 68));
+                    g2.setColor(new Color(255, 241, 118));
                     g2.drawLine(u.x, u.y, v.x, v.y);
                 } else {
-                    g2.setStroke(new BasicStroke(isHovered ? 2f : 1.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                    g2.setColor(isHovered ? new Color(148, 163, 184) : new Color(71, 85, 105));
+                    g2.setStroke(new BasicStroke(isHovered ? 4.5f : 3.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.setColor(isHovered ? new Color(255, 255, 255) : new Color(250, 250, 250));
                     g2.drawLine(u.x, u.y, v.x, v.y);
                 }
 
@@ -269,18 +283,17 @@ public class GraphVisualizerPanel extends JPanel {
         int pillY = y - pillH / 2;
 
         // Badge background
-        g2.setColor(isBlocked ? new Color(127, 29, 29, 230) :
-                   (isHovered ? new Color(30, 58, 138, 230) : new Color(15, 23, 42, 210)));
+        g2.setColor(isBlocked ? new Color(198, 40, 40) : Color.WHITE);
         g2.fillRoundRect(pillX, pillY, pillW, pillH, 8, 8);
 
         // Badge border
-        g2.setColor(isBlocked ? new Color(239, 68, 68) :
-                   (isHovered ? new Color(96, 165, 250) : new Color(71, 85, 105)));
+        g2.setColor(isBlocked ? new Color(198, 40, 40) :
+                   (isHovered ? new Color(66, 133, 244) : new Color(190, 190, 190)));
         g2.setStroke(new BasicStroke(1f));
         g2.drawRoundRect(pillX, pillY, pillW, pillH, 8, 8);
 
         // Text
-        g2.setColor(isBlocked ? new Color(254, 202, 202) : (isHovered ? Color.WHITE : new Color(203, 213, 225)));
+        g2.setColor(isBlocked ? Color.WHITE : (isHovered ? new Color(25, 90, 190) : new Color(80, 80, 80)));
         g2.drawString(text, pillX + 4, pillY + fm.getAscent() + 1);
     }
 
@@ -289,12 +302,12 @@ public class GraphVisualizerPanel extends JPanel {
 
         List<CityGraph.CityNode> nodes = graph.getNodes();
 
-        // Multi-layer neon glowing pulse
+        // Google-route inspired blue route with a subtle high-visibility glow.
         float glowAlpha = 0.4f + 0.25f * (float) Math.sin(pulsePhase * 2);
 
         // Outer glow layer
-        g2.setStroke(new BasicStroke(10f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2.setColor(new Color(6, 182, 212, (int) (glowAlpha * 90)));
+        g2.setStroke(new BasicStroke(13f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setColor(new Color(66, 133, 244, (int) (glowAlpha * 90)));
         for (int i = 0; i < activePath.size() - 1; i++) {
             CityGraph.CityNode u = nodes.get(activePath.get(i));
             CityGraph.CityNode v = nodes.get(activePath.get(i + 1));
@@ -302,8 +315,8 @@ public class GraphVisualizerPanel extends JPanel {
         }
 
         // Mid glow layer
-        g2.setStroke(new BasicStroke(5.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2.setColor(new Color(56, 189, 248, (int) (glowAlpha * 180)));
+        g2.setStroke(new BasicStroke(7f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setColor(new Color(66, 133, 244, 210));
         for (int i = 0; i < activePath.size() - 1; i++) {
             CityGraph.CityNode u = nodes.get(activePath.get(i));
             CityGraph.CityNode v = nodes.get(activePath.get(i + 1));
@@ -311,8 +324,8 @@ public class GraphVisualizerPanel extends JPanel {
         }
 
         // Inner sharp neon core with traveling pulses
-        g2.setStroke(new BasicStroke(2.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2.setColor(new Color(240, 253, 250));
+        g2.setStroke(new BasicStroke(2.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setColor(new Color(217, 232, 255));
         for (int i = 0; i < activePath.size() - 1; i++) {
             CityGraph.CityNode u = nodes.get(activePath.get(i));
             CityGraph.CityNode v = nodes.get(activePath.get(i + 1));
@@ -348,7 +361,7 @@ public class GraphVisualizerPanel extends JPanel {
                 g2.fillOval(node.x - radius - 4, node.y - radius - 4, (radius + 4) * 2, (radius + 4) * 2);
             }
 
-            // Node Circle Body
+            // Prominent place marker. Colours communicate service type at a glance.
             Color baseColor = new Color(node.type.colorHex);
             GradientPaint gp = new GradientPaint(
                     node.x - radius, node.y - radius, isHovered ? baseColor.brighter() : baseColor,
@@ -367,7 +380,7 @@ public class GraphVisualizerPanel extends JPanel {
                 g2.setColor(new Color(103, 232, 249));
                 g2.setStroke(new BasicStroke(2.2f));
             } else {
-                g2.setColor(new Color(255, 255, 255, 180));
+                g2.setColor(Color.WHITE);
                 g2.setStroke(new BasicStroke(1.5f));
             }
             g2.drawOval(node.x - radius, node.y - radius, radius * 2, radius * 2);
@@ -398,19 +411,19 @@ public class GraphVisualizerPanel extends JPanel {
         int pillY = node.y + 20;
 
         // Label Background Pill
-        g2.setColor(isStart ? new Color(6, 78, 59, 230) :
-                   (isEnd ? new Color(127, 29, 29, 230) : new Color(15, 23, 42, 210)));
+        g2.setColor(isStart ? new Color(232, 245, 233, 245) :
+                   (isEnd ? new Color(255, 235, 238, 245) : new Color(255, 255, 255, 240)));
         g2.fillRoundRect(pillX, pillY, pillW, pillH, 6, 6);
 
         // Label Border
-        g2.setColor(isStart ? new Color(52, 211, 153) :
-                   (isEnd ? new Color(248, 113, 113) : new Color(71, 85, 105)));
+        g2.setColor(isStart ? new Color(52, 168, 83) :
+                   (isEnd ? new Color(234, 67, 53) : new Color(190, 190, 190)));
         g2.setStroke(new BasicStroke(1f));
         g2.drawRoundRect(pillX, pillY, pillW, pillH, 6, 6);
 
         // Label Text
-        g2.setColor(isStart ? new Color(209, 250, 229) :
-                   (isEnd ? new Color(254, 226, 226) : new Color(241, 245, 249)));
+        g2.setColor(isStart ? new Color(19, 100, 52) :
+                   (isEnd ? new Color(174, 35, 28) : new Color(45, 45, 45)));
         g2.drawString(text, pillX + 5, pillY + fm.getAscent() + 1);
     }
 
@@ -478,10 +491,10 @@ public class GraphVisualizerPanel extends JPanel {
     }
 
     private void drawOverlayHUD(Graphics2D g2, int w, int h) {
-        // Top Left Status Badge
-        g2.setColor(new Color(15, 23, 42, 220));
+        // Top-left map status card
+        g2.setColor(new Color(255, 255, 255, 238));
         g2.fillRoundRect(12, 12, 275, 44, 10, 10);
-        g2.setColor(UITheme.BORDER_DARK);
+        g2.setColor(new Color(210, 210, 210));
         g2.setStroke(new BasicStroke(1.2f));
         g2.drawRoundRect(12, 12, 275, 44, 10, 10);
 
@@ -490,20 +503,20 @@ public class GraphVisualizerPanel extends JPanel {
         g2.fillOval(24, 28, 10, 10);
 
         g2.setFont(UITheme.fontBold(12f));
-        g2.setColor(new Color(241, 245, 249));
-        g2.drawString("METRO 911 ROAD SIMULATION", 42, 28);
+        g2.setColor(new Color(32, 33, 36));
+        g2.drawString("METRO 911 LIVE MAP", 42, 28);
         g2.setFont(UITheme.font(10f));
-        g2.setColor(UITheme.TEXT_SECONDARY);
-        g2.drawString("18-Node Metropolitan Grid • O(V³) Matrix Active", 42, 45);
+        g2.setColor(new Color(95, 99, 104));
+        g2.drawString("18 locations • routing network online", 42, 45);
 
         // Bottom Left Interactive Controls Guide
-        g2.setColor(new Color(15, 23, 42, 220));
-        g2.fillRoundRect(12, h - 38, 590, 26, 8, 8);
-        g2.setColor(UITheme.BORDER_DARK);
-        g2.drawRoundRect(12, h - 38, 590, 26, 8, 8);
+        g2.setColor(new Color(255, 255, 255, 238));
+        g2.fillRoundRect(12, h - 38, 560, 26, 8, 8);
+        g2.setColor(new Color(210, 210, 210));
+        g2.drawRoundRect(12, h - 38, 560, 26, 8, 8);
 
         g2.setFont(UITheme.font(11f));
-        g2.setColor(new Color(203, 213, 225));
-        g2.drawString("Left-Click: Start  |  Right-Click: Dest  |  Click Road: Block/Unblock  |  Drag: Move node", 20, h - 21);
+        g2.setColor(new Color(70, 70, 70));
+        g2.drawString("Click: start  |  Right-click: destination  |  Click road: closure  |  Drag: reposition", 20, h - 21);
     }
 }

@@ -11,15 +11,14 @@ import javax.swing.table.TableColumn;
 /**
  * Modern Emergency Dispatch Command Center UI.
  * Styled with Apple San Francisco typography and high-contrast tactile action buttons.
- * Integrates an intricate 18-node metropolitan blueprint, realistic multi-hop emergency navigation,
- * step-by-step DP matrix inspector, matrix tabs, and DAA algorithm research analytics.
+ * Integrates a map-style metropolitan road network, realistic emergency navigation,
+ * route matrices, and DAA algorithm research analytics.
  */
 public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.RouteChangeListener {
     private final CityGraph cityGraph = new CityGraph();
     private FloydWarshall algorithm;
 
     private GraphVisualizerPanel visualizerPanel;
-    private AlgorithmVisualizerPanel algoVisualizerPanel;
     private AnalyticsPanel analyticsPanel;
 
     private JComboBox<String> startBox;
@@ -37,7 +36,7 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
     private JTable directRoadTable;
 
     public RoutePlannerUI() {
-        setTitle("911 Emergency Vehicle Route Planner & DAA Visualizer | Floyd–Warshall");
+        setTitle("911 Emergency Route Planner | Metro Dispatch Command");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1240, 780);
         setMinimumSize(new Dimension(1080, 680));
@@ -50,9 +49,6 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
 
     private void recalculateAlgorithm() {
         this.algorithm = new FloydWarshall(cityGraph.getRoads(), cityGraph.getLocations());
-        if (algoVisualizerPanel != null) {
-            algoVisualizerPanel.recompute();
-        }
         if (analyticsPanel != null) {
             analyticsPanel.refreshMetrics();
         }
@@ -76,14 +72,10 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         // Tab 1: Live Interactive Map & Dispatch Center
         mainTabs.addTab("Map & 911 Dispatch", createMapAndDispatchTab());
 
-        // Tab 2: Floyd-Warshall Step-by-Step Algorithm Visualizer
-        algoVisualizerPanel = new AlgorithmVisualizerPanel(cityGraph);
-        mainTabs.addTab("Floyd–Warshall DP Visualizer", algoVisualizerPanel);
+        // Technical route data for the seminar demonstration
+        mainTabs.addTab("Route Data & Matrices", createMatricesTab());
 
-        // Tab 3: Distance & Routing Matrices
-        mainTabs.addTab("Distance & Routing Matrices", createMatricesTab());
-
-        // Tab 4: DAA Analytics & Complexity Comparison
+        // Algorithm rationale and benchmark comparison
         analyticsPanel = new AnalyticsPanel(cityGraph);
         mainTabs.addTab("DAA Research & Benchmarks", analyticsPanel);
 
@@ -133,11 +125,11 @@ public class RoutePlannerUI extends JFrame implements GraphVisualizerPanel.Route
         JPanel titleBlock = new JPanel(new GridLayout(2, 1, 0, 2));
         titleBlock.setOpaque(false);
 
-        JLabel title = new JLabel("EMERGENCY VEHICLE DISPATCH COMMAND SYSTEM");
+        JLabel title = new JLabel("METRO 911 EMERGENCY DISPATCH");
         title.setFont(UITheme.fontBold(16f));
         title.setForeground(new Color(248, 113, 113));
 
-        JLabel sub = new JLabel("DAA Mini Project • Metropolitan All-Pairs Shortest Path Optimization with Floyd–Warshall O(V³)");
+        JLabel sub = new JLabel("Live route simulation • Instant nearest-unit response • Powered by precomputed shortest paths");
         sub.setFont(UITheme.font(12f));
         sub.setForeground(UITheme.TEXT_SECONDARY);
 
